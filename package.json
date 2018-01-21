@@ -13,7 +13,8 @@
     "sockjs": "^0.3.19",
     "tracer": "latest",
     "twilio": "latest",
-    "url": "latest"
+    "url": "latest",
+    "http": "latest"
   },
   "devDependencies": {}
 }
