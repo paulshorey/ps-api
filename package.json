@@ -7,7 +7,9 @@
   "dependencies": {
     "body-parser": "latest",
     "express": "latest",
+    "colors": "latest",
     "request": "latest",
+    "tracer": "latest",
     "serve-static": "latest",
     "url": "^0.11.0"
   },
