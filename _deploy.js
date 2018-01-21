@@ -8,7 +8,7 @@ app.set('port', 9999);
 app.all('/_deploy', function(req, res) {
 
 	// done
-	res.json(200, {
+	res.status(200).json({
 		message: 'Github Hook received!'
 	});
 
