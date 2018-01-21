@@ -1,19 +1,20 @@
 var pro = process;
+var express = require('express');
 // env (settings)
 process.env.PATH = __dirname;
 // app (express)
-process.app = process.inc.express();
-process.app.use(process.inc.express_parser.json({
+process.app = express.express();
+process.app.use(express.express_parser.json({
 	limit: '50mb',
 	parameterLimit: 10000,
 	extended: true
 }));
-process.app.use(process.inc.express_parser.urlencoded({
+process.app.use(express.express_parser.urlencoded({
 	limit: '50mb',
 	parameterLimit: 10000,
 	extended: true
 }));
-process.app.use(process.inc.express.static('public'));
+process.app.use(express.express.static('public'));
 process.app.disable('trust proxy');
 process.app.use(function(request, response, next){
 	var referrer = process.url.parse(request.headers.referer||'', true, true).hostname;

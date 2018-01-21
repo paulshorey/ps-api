@@ -1,7 +1,7 @@
-var fs = require('fs'),
-	express = require('express'),
-	http = require('http'),
-	app = express();
+var fs = require('fs');
+var express = require('express');
+var http = require('http');
+var app = express();
 
 app.set('port', 9999);
 
