@@ -45,16 +45,28 @@ process.secret = require('../secret/all.js');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// MODEL (in memory always!)
-var model = {};
+// MODEL
+process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twilio.token);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// THE API (endpoints)
+// API
 // GET
-process.app.get('/test/', function(request, response) {
+process.app.get('/hello', function(request, response) {
 	process.console.info('get /hello');
+	process.twilio.messages.create(
+		{
+			body: "Hello Paul - ",
+			to: '+13857706789',
+			from: '+14158141829',
+			// mediaUrl: 'http://www.example.com/cheeseburger.png',
+		},
+		(err, message) => {
+			process.stdout.write(message.sid);
+		}
+	);
+	
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
 	response.write(JSON.stringify({data:"world", error:0},null,"\t"));
