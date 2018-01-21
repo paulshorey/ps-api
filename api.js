@@ -98,6 +98,17 @@ ws.listen(8888);
 process.app.post('/twilio/sms/in', function(request, response) {
 	process.console.log('post /twilio/sms/in');
 	process.console.info(request.body.Body);
+	var message = request.body.Body;
+	
+	// someone typed something:
+	console.log("replied:         ",message);
+	// broadcast this new thing to all (except the typist):
+	var ci = 0;
+	for (var client in process.wsClients){
+		ci++;
+		process.wsClients[client].write(message);
+	}
+	console.log('number of process.wsClients connected:   '+ci);
 
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
