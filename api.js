@@ -1,24 +1,26 @@
 var pro = process;
-var express = require('express');
+process.inc = {};
+process.inc.express = require('express');
+process.inc.express_parser = require('body-parser');
 // env (settings)
 process.env.PATH = __dirname;
 // app (express)
-process.app = express.express();
-process.app.use(express.express_parser.json({
+process.app = process.inc.express();
+process.app.use(process.inc.express_parser.json({
 	limit: '50mb',
 	parameterLimit: 10000,
 	extended: true
 }));
-process.app.use(express.express_parser.urlencoded({
+process.app.use(process.inc.express_parser.urlencoded({
 	limit: '50mb',
 	parameterLimit: 10000,
 	extended: true
 }));
-process.app.use(express.express.static('public'));
+process.app.use(process.inc.express.static('public'));
 process.app.disable('trust proxy');
 process.app.use(function(request, response, next){
 	var referrer = process.url.parse(request.headers.referer||'', true, true).hostname;
-	response.setHeader('Access-Control-Allow-Origin', '*'); // CHANGE THIS ASAP !!
+	response.setHeader('Access-Control-Allow-Origin', '*'); // header contains the invalid value 'app.allevents.nyc'. Origin 'http://app.allevents.nyc' is therefore not allowed access <-- don't know if browser will include http:// or not
 	response.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 	response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Cache-Control, Pragma, Authorization, Content-Length, X-Requested-With, X-Host');
 	if ('OPTIONS' == request.method) {
@@ -48,7 +50,7 @@ var model = {};
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // THE API (endpoints)
 // GET
-process.app.get('/hello', function(request, response) {
+process.app.get('/test/', function(request, response) {
 	process.console.log('get /hello');
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
