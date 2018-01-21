@@ -55,17 +55,13 @@ process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twi
 // GET
 process.app.get('/hello', function(request, response) {
 	process.console.info('get /hello');
-	process.twilio.messages.create(
-		{
-			body: "Hello Paul - ",
-			to: '+13857706789',
-			from: '+13853931493',
-			// mediaUrl: 'http://www.example.com/cheeseburger.png',
-		},
-		(err, message) => {
-			console.warn(message.sid, err, message);
-		}
-	);
+	client.messages
+	.create({
+		messagingServiceSid: 'PN547894b4c6b4bfed06330b8eb5f3fa83',
+		to: '+13857706789',
+		body: 'Hello Paul',
+	})
+	.then(message => process.console.info(message));
 	
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
