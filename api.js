@@ -54,7 +54,7 @@ var model = {};
 // THE API (endpoints)
 // GET
 process.app.get('/test/', function(request, response) {
-	process.console.log('get /hello');
+	process.console.info('get /hello');
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
 	response.write(JSON.stringify({data:"world", error:0},null,"\t"));
@@ -62,10 +62,10 @@ process.app.get('/test/', function(request, response) {
 });
 // POST
 process.app.post('/twilio/sms/in', function(request, response) {
-	process.console.log('get /twilio/sms/in');
+	process.console.info('post /twilio/sms/in',JSON.stringify(request.body));
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
-	response.write(JSON.stringify({data:request.body, error:0},null,"\t"));
+	response.write(JSON.stringify({data:"ok", error:0},null,"\t"));
 	response.end();
 });
 
