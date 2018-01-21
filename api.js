@@ -36,9 +36,9 @@ process.app.use(function(request, response, next){
 	}
 });
 // custom
-// process.fun = require("./node_custom/fun.js");
-// process.console = require("./node_custom/console.js").console; // uses process.app
-// process.response = require("./node_custom/response.js");
+process.fun = require("./node_custom/fun.js");
+process.console = require("./node_custom/console.js").console; // uses process.app
+process.response = require("./node_custom/response.js");
 // secret
 process.secret = require('../secret/all.js');
 

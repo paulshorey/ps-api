@@ -1,0 +1,16 @@
+{
+  "name": "My-API",
+  "version": "0.0.1",
+  "description": "back-end experiments",
+  "author": "Paul Shorey",
+  "scripts": {},
+  "dependencies": {
+    "body-parser": "latest",
+    "express": "latest",
+    "request": "latest",
+    "serve-static": "latest",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+  }
+}
