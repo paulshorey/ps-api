@@ -6,14 +6,14 @@
   "scripts": {},
   "dependencies": {
     "body-parser": "latest",
-    "express": "latest",
     "colors": "latest",
+    "express": "latest",
     "request": "latest",
-    "tracer": "latest",
     "serve-static": "latest",
-    "url": "latest",
-    "twilio": "latest"
+    "sockjs": "^0.3.19",
+    "tracer": "latest",
+    "twilio": "latest",
+    "url": "latest"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

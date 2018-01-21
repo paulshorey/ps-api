@@ -36,59 +36,79 @@ process.app.use(function(request, response, next){
 	}
 });
 // custom
-// process.fun = require("./node_custom/fun.js");
-process.console = require("./node_custom/console.js").console; // uses process.app
-// process.response = require("./node_custom/response.js");
+process.console = require("./node_custom/console.js").console; // wip: uses {process.app}, requires npm 'colors' and 'tracer' packages to be installed
 // secret
 process.secret = require('../secret/all.js');
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// MODEL
+// phone
 process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twilio.token);
+// ws
+process.ws = require('sockjs').createServer({ sockjs_url: '' });
+process.wsClients = {};
+// in <--
+process.ws.on('connection', function(conn) {
+    console.log("connected:            " + conn.id);
+    process.wsClients[conn.id] = conn;
+    conn.on('data', function(message) {
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		// WS --> phone
+		// process.console.log('post /twilio/sms/out');
+		// process.twilio.messages
+		// .create({
+		// 	body: "It works! Hopefully?",
+		// 	to: process.secret.twilio.toPhoneNumber,
+		// 	from: process.secret.twilio.fromPhoneNumber
+		// })
+		// .then(message => process.console.info(message))
+		// .catch(error => process.console.warn(error));
+		// someone typed something:
+		console.log("new message:         ",message);
+		// broadcast this new thing to all (except the typist):
+        var ci = 0;
+		for (var client in process.wsClients){
+			ci++;
+			process.wsClients[client].write(message);
+		}
+		console.log('number of process.wsClients connected:   '+ci);
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// API
-// GET
-process.app.get('/hello', function(request, response) {
-	process.console.info('get /hello');
-	process.twilio.messages
-	// .create({
-	// 	messagingServiceSid: 'PN547894b4c6b4bfed06330b8eb5f3fa83',
-	// 	to: '+13857706789',
-	// 	body: 'Hello Paul',
-	// })
-	// .then(message => process.console.info(message))
-	// .catch(error => process.console.warn(error));
-	.create({
-		body: "It works! Hopefully?",
-		to: '+13857706789',
-		from: '+13853931493',
-		// mediaUrl: 'http://www.example.com/cheeseburger.png',
-	})
-	.then(message => process.console.info(message))
-	.catch(error => process.console.warn(error));
-	
-	response.setHeader('Content-Type', 'application/json');
-	response.writeHead(200);
-	response.write(JSON.stringify({data:"world", error:0},null,"\t"));
-	response.end();
+		
+    });
+    conn.on('close', function() {
+      console.log("disconnect:           " + conn.id);
+      delete process.wsClients[conn.id];
+    });
 });
-// POST
+// serve!
+var ws = http.createServer(function (req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.write('Hello World!');
+  res.end();
+});
+process.ws.installHandlers(ws, {prefix:'/chat'});
+ws.listen(8888);
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// phone --> WS
 process.app.post('/twilio/sms/in', function(request, response) {
-	process.console.info('post /twilio/sms/in',JSON.stringify(request.body));
+	process.console.log('post /twilio/sms/in');
+	process.console.info(request.body.Body);
+
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
-	response.write(JSON.stringify({data:"ok", error:0},null,"\t"));
+	response.write(JSON.stringify({data:"sms received", error:0},null,"\t"));
 	response.end();
 });
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// start
+////////////////////////////////////////////////////////////////////////////////////////////////////
 var httpServer = process.http.createServer(process.app);
 httpServer.listen(1080);
 // var httpsServer = process.https.createServer({key: process.fs.readFileSync('/etc/letsencrypt/live/api.paulshorey.com/privkey.pem', 'utf8'), cert: process.fs.readFileSync('/etc/letsencrypt/live/api.paulshorey.com/fullchain.pem', 'utf8')}, process.app);
