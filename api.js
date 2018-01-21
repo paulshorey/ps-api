@@ -63,7 +63,7 @@ process.app.get('/hello', function(request, response) {
 			// mediaUrl: 'http://www.example.com/cheeseburger.png',
 		},
 		(err, message) => {
-			process.stdout.write(message.sid);
+			console.warn(message.sid, err, message);
 		}
 	);
 	
