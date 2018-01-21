@@ -4,6 +4,7 @@ process.inc.express = require('express');
 process.inc.express_parser = require('body-parser');
 process.fs = require('fs');
 process.http = require('http');
+process.url = require('url');
 // env (settings)
 process.env.PATH = __dirname;
 // app (express)
