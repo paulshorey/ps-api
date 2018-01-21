@@ -56,10 +56,18 @@ process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twi
 process.app.get('/hello', function(request, response) {
 	process.console.info('get /hello');
 	process.twilio.messages
+	// .create({
+	// 	messagingServiceSid: 'PN547894b4c6b4bfed06330b8eb5f3fa83',
+	// 	to: '+13857706789',
+	// 	body: 'Hello Paul',
+	// })
+	// .then(message => process.console.info(message))
+	// .catch(error => process.console.warn(error));
 	.create({
-		messagingServiceSid: 'PN547894b4c6b4bfed06330b8eb5f3fa83',
+		body: "It works! Hopefully?",
 		to: '+13857706789',
-		body: 'Hello Paul',
+		from: '+13853931493',
+		// mediaUrl: 'http://www.example.com/cheeseburger.png',
 	})
 	.then(message => process.console.info(message))
 	.catch(error => process.console.warn(error));
