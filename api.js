@@ -47,11 +47,20 @@ var model = {};
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // THE API (endpoints)
+// GET
 process.app.get('/hello', function(request, response) {
 	process.console.log('get /hello');
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
 	response.write(JSON.stringify({data:"world", error:0},null,"\t"));
+	response.end();
+});
+// POST
+process.app.post('/twilio/sms/in', function(request, response) {
+	process.console.log('get /twilio/sms/in');
+	response.setHeader('Content-Type', 'application/json');
+	response.writeHead(200);
+	response.write(JSON.stringify({data:request.body, error:0},null,"\t"));
 	response.end();
 });
 
