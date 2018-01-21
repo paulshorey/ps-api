@@ -57,15 +57,14 @@ process.ws.on('connection', function(conn) {
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// WS --> phone
-		// process.console.log('post /twilio/sms/out');
-		// process.twilio.messages
-		// .create({
-		// 	body: "It works! Hopefully?",
-		// 	to: process.secret.twilio.toPhoneNumber,
-		// 	from: process.secret.twilio.fromPhoneNumber
-		// })
-		// .then(message => process.console.info(message))
-		// .catch(error => process.console.warn(error));
+		process.twilio.messages
+		.create({
+			body: message,
+			to: process.secret.twilio.toPhoneNumber,
+			from: process.secret.twilio.fromPhoneNumber
+		})
+		.then(message => process.console.info(message))
+		.catch(error => process.console.warn(error));
 		// someone typed something:
 		console.log("new message:         ",message);
 		// broadcast this new thing to all (except the typist):
