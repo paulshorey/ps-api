@@ -2,6 +2,8 @@ var pro = process;
 process.inc = {};
 process.inc.express = require('express');
 process.inc.express_parser = require('body-parser');
+process.fs = require('fs');
+process.http = require('http');
 // env (settings)
 process.env.PATH = __dirname;
 // app (express)
