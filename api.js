@@ -53,19 +53,20 @@ process.wsClientsLength = 0;
 process.ws.on('connection', function(conn) {
 	process.console.info('new user connected: '+conn.id);
 
-	// add current user
-    process.wsClients[conn.id] = conn;
-	process.wsClientsLength++;
 
 	// ws --> ws
-	// alert all users
+	// make note of existing users
 	var users = {};
+	var ui = 0;
 	for (var c in process.wsClients){
-		if (process.wsClients[c].user) {
-			users[c] = process.wsClients[c].user;
-		}
+		ui++;
+		users[c] = process.wsClients[c].user || {};
 	}
-	if (users) {
+	// include current user to alert
+    process.wsClients[conn.id] = conn;
+	process.wsClientsLength++;
+	// alert users
+	if (ui) {
 		var metaData = {
 			users
 		};
