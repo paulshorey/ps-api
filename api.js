@@ -50,8 +50,8 @@ process.ws = require('sockjs').createServer({ sockjs_url: '' });
 process.wsClients = {};
 // in <--
 process.ws.on('connection', function(conn) {
-	console.log('number of clients connected: '+ci);
     process.wsClients[conn.id] = conn;
+	console.log('new client connected: '+conn.id);
     conn.on('data', function(message, id) {
 		console.log("new message: ",message);
 		console.log("mid?: ",id);
