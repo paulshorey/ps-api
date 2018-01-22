@@ -52,12 +52,17 @@ process.wsClientsLength = 0;
 // WS CONNECTED
 process.ws.on('connection', function(conn) {
 
+	// add current user
+    process.wsClients[conn.id] = conn;
+	process.wsClientsLength++;
+
 	// ws --> ws
-	
 	// alert all users
 	var clients = {};
 	for (var c in process.wsClients){
-		clients[c] = process.wsClients[c].user;
+		if (process.wsClients[c].user) {
+			clients[c] = process.wsClients[c].user;
+		}
 	}
 	var metaData = {
 		users: clients
@@ -65,10 +70,6 @@ process.ws.on('connection', function(conn) {
 	for (var client in process.wsClients){
 		process.wsClients[client].write(JSON.stringify(metaData));
 	}
-
-	// add current user
-    process.wsClients[conn.id] = conn;
-	process.wsClientsLength++;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
