@@ -78,7 +78,7 @@ process.ws.on('connection', function(conn) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WS RECEIVED
-    conn.on('data', function(msgData) {
+	conn.on('data', function(msgData) {
 		msgData = JSON.parse(msgData);
 		/*
 			msgData: {
@@ -91,7 +91,7 @@ process.ws.on('connection', function(conn) {
 		*/
 		if (msgData.user) {
 			process.wsClients[conn.id].user = msgData.user;
-			process.console.log('user info received '+conn.id+" "+JSON.stringify(msgData.user));
+			// process.console.warn('user info received '+conn.id+" "+JSON.stringify(msgData.user));
 		}
 		if (msgData.message) {
 		
@@ -112,11 +112,31 @@ process.ws.on('connection', function(conn) {
 			
 		}
 	});
+
 	// WS CLIENT DISCONNECTED
-    conn.on('close', function() {
-      delete process.wsClients[conn.id];
+	conn.on('close', function() {
+	  delete process.wsClients[conn.id];
 	  process.wsClientsLength--;
-    });
+
+	  // ws --> ws
+	  // make note of existing users
+	  var users = {};
+	  var ui = 0;
+	  for (var c in process.wsClients){
+		  ui++;
+		  users[c] = process.wsClients[c].user || {};
+	  }
+	  // alert users
+	  if (ui) {
+		  var metaData = {
+			  users
+		  };
+		  for (var client in process.wsClients){
+			  process.wsClients[client].write(JSON.stringify(metaData));
+		  }
+	  }
+	});
+	
 });
 // WS START
 var ws = process.http.createServer(function (req, res) {
