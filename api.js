@@ -90,8 +90,8 @@ process.ws.on('connection', function(conn) {
 			}
 		*/
 		if (msgData.user) {
-			process.console.log('user info received '+JSON.stringify(msgData.user));
 			process.wsClients[conn.id].user = msgData.user;
+			process.console.log('user info received '+conn.id+" "+JSON.stringify(msgData.user));
 		}
 		if (msgData.message) {
 		
