@@ -52,26 +52,27 @@ process.wsClients = {};
 process.ws.on('connection', function(conn) {
     process.wsClients[conn.id] = conn;
 	console.log('new client connected: '+conn.id);
-    conn.on('data', function(message, id) {
-		console.log("new message: ",message);
-		console.log("mid?: ",id);
+    conn.on('data', function(msgData) {
+		console.log("new msgData: ",msgData);
+		msgData = JSON.parse(msgData);
+		process.console.warn('who is the sender?... '+conn.id);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// WS --> phone
 		process.twilio.messages
 		.create({
-			body: message,
+			body: (msgData.geo ? msgData.citycountry+" " : "") + msgData.message,
 			to: process.secret.twilio.toPhoneNumber,
 			from: process.secret.twilio.fromPhoneNumber
 		})
-		.then(message => process.console.info(message))
+		.then(msgData => process.console.info(msgData))
 		.catch(error => process.console.warn(error));
-		// broadcast this message to all (except the typist):
+		// broadcast this msgData to all (except the typist):
         var ci = 0;
 		for (var client in process.wsClients){
 			ci++;
-			process.wsClients[client].write(message);
+			process.wsClients[client].write(JSON.stringify(msgData));
 		}
 
 		
@@ -98,15 +99,17 @@ ws.listen(8888);
 process.app.post('/twilio/sms/in', function(request, response) {
 	process.console.log('post /twilio/sms/in');
 	process.console.info(request.body.Body);
-	var message = request.body.Body;
+	var msgData = {
+		message: request.body.Body
+	};
 
 	// someone typed something:
-	console.log("replied:         ",message);
+	console.log("replied:         ",JSON.stringify(msgData));
 	// broadcast this new thing to all (except the typist):
 	var ci = 0;
 	for (var client in process.wsClients){
 		ci++;
-		process.wsClients[client].write(message);
+		process.wsClients[client].write(JSON.stringify(msgData));
 	}
 
 	response.setHeader('Content-Type', 'application/json');
