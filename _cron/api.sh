@@ -15,10 +15,10 @@ cd /www/ps-api
 git reset HEAD -\-hard;
 git pull
 
-# i=0;
-# while true; do
-# 	i=$[$i+1]
-# 	echo node api.js \#$i
-# 	node api.js
-# 	sleep 5
-# done
+i=0;
+while true; do
+	i=$[$i+1]
+	echo node api.js \#$i
+	node api.js
+	sleep 5
+done

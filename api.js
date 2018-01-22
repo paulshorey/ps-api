@@ -38,17 +38,18 @@ process.app.use(function(request, response, next){
 // custom
 process.console = require("./node_custom/console.js").console; // wip: uses {process.app}, requires npm 'colors' and 'tracer' packages to be installed
 // secret
-process.secret = require('../secret/all.js');
+process.secret = require('../secret/all.js'); // not on GitHub hehehe!
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// phone
+// TWILIO
 process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twilio.token);
-// ws
+// WS
 process.ws = require('sockjs').createServer({ sockjs_url: '' });
 process.wsClients = {};
 process.wsClientsLength = 0;
+
 // WS CONNECTED
 process.ws.on('connection', function(conn) {
 	process.console.info('new user connected: '+conn.id);
@@ -57,8 +58,10 @@ process.ws.on('connection', function(conn) {
 	process.wsClients[conn.id].user = {}; // we must find out!
 	process.wsClientsLength++;
 
-	// ws --> ws
-	// make note of existing users
+	/*
+		WS NOTIFY USERS
+		make note of existing users
+	*/
 	var users = {};
 	var ui = 0;
 	for (var c in process.wsClients){
@@ -95,7 +98,10 @@ process.ws.on('connection', function(conn) {
 		}
 		if (msgData.message) {
 		
-			// ws --> phone
+			/*
+				WS CALL HOME
+				* text Paul the message
+			*/
 			process.twilio.messages
 			.create({
 				body: (process.wsClients[conn.id].user ? process.wsClients[conn.id].user.name+" " : "") + msgData.message,
@@ -105,7 +111,10 @@ process.ws.on('connection', function(conn) {
 			.then(msgData => process.console.info(msgData))
 			.catch(error => process.console.warn(error));
 			
-			// ws --> ws
+			/*
+				WS COPY USERS
+				* tell everyone what someone said
+			*/
 			for (var client in process.wsClients){
 				process.wsClients[client].write(JSON.stringify(msgData));
 			}
@@ -118,7 +127,10 @@ process.ws.on('connection', function(conn) {
 	  delete process.wsClients[conn.id];
 	  process.wsClientsLength--;
 
-	  // ws --> ws
+	  /*
+	  	WS NOTIFY USERS
+		  * that someone has left
+	  */
 	  // make note of existing users
 	  var users = {};
 	  var ui = 0;
@@ -150,7 +162,7 @@ ws.listen(8888);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// PHONE RECEIVED
+// TWILIO RECEIVED
 process.app.post('/twilio/sms/in', function(request, response) {
 	var msgData = {
 		message: request.body.Body,
@@ -159,7 +171,10 @@ process.app.post('/twilio/sms/in', function(request, response) {
 		}
 	};
 
-	// phone --> ws
+	/*
+		WS SAY THE WORD
+		* tell users what Paul responded
+	*/
 	for (var client in process.wsClients){
 		process.wsClients[client].write(JSON.stringify(msgData));
 	}
@@ -174,6 +189,7 @@ process.app.post('/twilio/sms/in', function(request, response) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+// START API SERVER
 var httpServer = process.http.createServer(process.app);
 httpServer.listen(1080);
 // var httpsServer = process.https.createServer({key: process.fs.readFileSync('/etc/letsencrypt/live/api.paulshorey.com/privkey.pem', 'utf8'), cert: process.fs.readFileSync('/etc/letsencrypt/live/api.paulshorey.com/fullchain.pem', 'utf8')}, process.app);
