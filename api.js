@@ -52,7 +52,10 @@ process.wsClientsLength = 0;
 // WS CONNECTED
 process.ws.on('connection', function(conn) {
 	process.console.info('new user connected: '+conn.id);
-
+	// new user
+	process.wsClients[conn.id] = conn;
+	process.wsClients[conn.id].user = {}; // we must find out!
+	process.wsClientsLength++;
 
 	// ws --> ws
 	// make note of existing users
@@ -62,9 +65,6 @@ process.ws.on('connection', function(conn) {
 		ui++;
 		users[c] = process.wsClients[c].user || {};
 	}
-	// include current user to alert
-    process.wsClients[conn.id] = conn;
-	process.wsClientsLength++;
 	// alert users
 	if (ui) {
 		var metaData = {
