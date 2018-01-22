@@ -50,9 +50,11 @@ process.ws = require('sockjs').createServer({ sockjs_url: '' });
 process.wsClients = {};
 // in <--
 process.ws.on('connection', function(conn) {
-    console.log("connected:            " + conn.id);
+	console.log('number of clients connected: '+ci);
     process.wsClients[conn.id] = conn;
-    conn.on('data', function(message) {
+    conn.on('data', function(message, id) {
+		console.log("new message: ",message);
+		console.log("mid?: ",id);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,20 +67,18 @@ process.ws.on('connection', function(conn) {
 		})
 		.then(message => process.console.info(message))
 		.catch(error => process.console.warn(error));
-		// someone typed something:
-		console.log("new message:         ",message);
-		// broadcast this new thing to all (except the typist):
+		// broadcast this message to all (except the typist):
         var ci = 0;
 		for (var client in process.wsClients){
 			ci++;
 			process.wsClients[client].write(message);
 		}
-		console.log('number of process.wsClients connected:   '+ci);
 
 		
     });
     conn.on('close', function() {
-      console.log("disconnect:           " + conn.id);
+      console.log("disconnect: " + conn.id);
+	  console.log('number of clients connected: '+ci);
       delete process.wsClients[conn.id];
     });
 });
@@ -99,7 +99,7 @@ process.app.post('/twilio/sms/in', function(request, response) {
 	process.console.log('post /twilio/sms/in');
 	process.console.info(request.body.Body);
 	var message = request.body.Body;
-	
+
 	// someone typed something:
 	console.log("replied:         ",message);
 	// broadcast this new thing to all (except the typist):
@@ -108,7 +108,6 @@ process.app.post('/twilio/sms/in', function(request, response) {
 		ci++;
 		process.wsClients[client].write(message);
 	}
-	console.log('number of process.wsClients connected:   '+ci);
 
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
