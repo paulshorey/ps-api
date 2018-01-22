@@ -54,6 +54,14 @@ process.ws.on('connection', function(conn) {
     process.wsClients[conn.id] = conn;
 	process.wsClientsLength++;
 
+	// ws --> ws
+	var metaData = {
+		users: process.wsClients
+	};
+	for (var client in process.wsClients){
+		process.wsClients[client].write(JSON.stringify(metaData));
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WS RECEIVED
@@ -68,27 +76,27 @@ process.ws.on('connection', function(conn) {
 				}
 			}
 		*/
-		// Reminder: if need to implement private person-person chat, use user.ip -
-		// but make sure that user.ip is assigned 100% reliably, and how to answer to an old sender who's post is not the most recent?
-		// if (msgData.user) {
-		// 	process.wsClients[conn.id].ip = msgData.user.ip;
-		// }
-		
-		// ws --> phone
-		process.twilio.messages
-		.create({
-			body: (msgData.user ? msgData.user.name+" " : "") + msgData.message,
-			to: process.secret.twilio.toPhoneNumber,
-			from: process.secret.twilio.fromPhoneNumber
-		})
-		.then(msgData => process.console.info(msgData))
-		.catch(error => process.console.warn(error));
-		
-		// ws --> ws
-		for (var client in process.wsClients){
-			process.wsClients[client].write(JSON.stringify(msgData));
+		if (msgData.user) {
+			process.wsClients[conn.id].user = msgData.user;
 		}
+		if (msgData.message) {
 		
+			// ws --> phone
+			process.twilio.messages
+			.create({
+				body: (msgData.user ? msgData.user.name+" " : "") + msgData.message,
+				to: process.secret.twilio.toPhoneNumber,
+				from: process.secret.twilio.fromPhoneNumber
+			})
+			.then(msgData => process.console.info(msgData))
+			.catch(error => process.console.warn(error));
+			
+			// ws --> ws
+			for (var client in process.wsClients){
+				process.wsClients[client].write(JSON.stringify(msgData));
+			}
+			
+		}
 	});
 	// WS CLIENT DISCONNECTED
     conn.on('close', function() {
@@ -118,9 +126,7 @@ process.app.post('/twilio/sms/in', function(request, response) {
 	};
 
 	// phone --> ws
-	var ci = 0;
 	for (var client in process.wsClients){
-		ci++;
 		process.wsClients[client].write(JSON.stringify(msgData));
 	}
 
