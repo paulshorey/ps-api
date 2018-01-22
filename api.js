@@ -48,45 +48,58 @@ process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twi
 // ws
 process.ws = require('sockjs').createServer({ sockjs_url: '' });
 process.wsClients = {};
-// in <--
+process.wsClientsLength = 0;
+// WS CONNECTED
 process.ws.on('connection', function(conn) {
     process.wsClients[conn.id] = conn;
-	console.log('new client connected: '+conn.id);
+	process.wsClientsLength++;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// WS RECEIVED
     conn.on('data', function(msgData) {
-		console.log("new msgData: ",msgData);
 		msgData = JSON.parse(msgData);
-		process.console.warn('who is the sender?... '+conn.id);
+		/*
+			msgData: {
+				message: String,
+				user: {
+					ip: string
+					name: string
+				}
+			}
+		*/
+		// Reminder: if need to implement private person-person chat, use user.ip -
+		// but make sure that user.ip is assigned 100% reliably, and how to answer to an old sender who's post is not the most recent?
+		// if (msgData.user) {
+		// 	process.wsClients[conn.id].ip = msgData.user.ip;
+		// }
 		
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// WS --> phone
+		// ws --> phone
 		process.twilio.messages
 		.create({
-			body: (msgData.geo ? msgData.citycountry+" " : "") + msgData.message,
+			body: (msgData.user ? msgData.name+" " : "") + msgData.message,
 			to: process.secret.twilio.toPhoneNumber,
 			from: process.secret.twilio.fromPhoneNumber
 		})
 		.then(msgData => process.console.info(msgData))
 		.catch(error => process.console.warn(error));
-		// broadcast this msgData to all (except the typist):
-        var ci = 0;
+		
+		// ws --> ws
 		for (var client in process.wsClients){
-			ci++;
 			process.wsClients[client].write(JSON.stringify(msgData));
 		}
-
 		
-    });
+	});
+	// WS CLIENT DISCONNECTED
     conn.on('close', function() {
-      console.log("disconnect: " + conn.id);
-	  console.log('number of clients connected: '+ci);
       delete process.wsClients[conn.id];
+	  process.wsClientsLength--;
     });
 });
-// serve!
+// WS START
 var ws = process.http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.write('Hello World!');
+  res.write('chat room ready');
   res.end();
 });
 process.ws.installHandlers(ws, {prefix:'/chat'});
@@ -95,23 +108,23 @@ ws.listen(8888);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// phone --> WS
+// PHONE RECEIVED
 process.app.post('/twilio/sms/in', function(request, response) {
-	process.console.log('post /twilio/sms/in');
-	process.console.info(request.body.Body);
 	var msgData = {
-		message: request.body.Body
+		message: request.body.Body,
+		user: {
+			name: "Paul"
+		}
 	};
 
-	// someone typed something:
-	console.log("replied:         ",JSON.stringify(msgData));
-	// broadcast this new thing to all (except the typist):
+	// phone --> ws
 	var ci = 0;
 	for (var client in process.wsClients){
 		ci++;
 		process.wsClients[client].write(JSON.stringify(msgData));
 	}
 
+	// success response
 	response.setHeader('Content-Type', 'application/json');
 	response.writeHead(200);
 	response.write(JSON.stringify({data:"sms received", error:0},null,"\t"));
