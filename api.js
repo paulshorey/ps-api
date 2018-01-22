@@ -98,7 +98,7 @@ process.ws.on('connection', function(conn) {
 			// ws --> phone
 			process.twilio.messages
 			.create({
-				body: (msgData.user ? msgData.user.name+" " : "") + msgData.message,
+				body: (process.wsClients[conn.id].user ? process.wsClients[conn.id].user.name+" " : "") + msgData.message,
 				to: process.secret.twilio.toPhoneNumber,
 				from: process.secret.twilio.fromPhoneNumber
 			})
