@@ -47,7 +47,7 @@ process.console = console;
 // GET /v1/console
 // POST /v1/console/command (postData: { key: {process.secret.console.key, command: "" })
 // replace standard {console.log} with advanced {process.console.log}, which distributes via webslocket connection to a self-spawned html app.
-process.console = require("./api/v1/console/index.js").module;
+process.console = require("./api/v1/console").module;
 process.console.info(process.secret);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ process.console.info(process.secret);
 // POST /v1/chat/SMS
 // WS :8888/v1/chat/WS
 // Relay between phone number SMS text and websocket clients.
-require('./api/v1/chat/index.js');
+require('./api/v1/chat');
 
 
 
