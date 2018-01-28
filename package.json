@@ -8,13 +8,13 @@
     "body-parser": "latest",
     "colors": "latest",
     "express": "latest",
+    "http": "latest",
     "request": "latest",
     "serve-static": "latest",
     "sockjs": "^0.3.19",
     "tracer": "latest",
     "twilio": "latest",
-    "url": "latest",
-    "http": "latest"
+    "url": "latest"
   },
   "devDependencies": {}
 }

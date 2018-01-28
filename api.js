@@ -35,19 +35,28 @@ process.app.use(function(request, response, next){
 		return;
 	}
 });
-// custom
-process.console = require("./node_custom/console.js").console; // wip: uses {process.app}, requires npm 'colors' and 'tracer' packages to be installed
-// secret
+// secrets
 process.secret = require('../secret/all.js'); // not on GitHub!
+process.console = console;
 
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// CONSOLE APP
+// GET /v1/console
+// POST /v1/console/command (postData: { key: {process.secret.console.key, command: "" })
+// replace standard {console.log} with advanced {process.console.log}, which distributes via webslocket connection to a self-spawned html app.
+process.console = require("./api/v1/console/index.js").module;
+process.console.info(process.secret);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // CHAT APP
-// GET /chat
-// POST /twillio/sms/in
-require('./all/chat/index.js');
+// POST /v1/chat/SMS
+// WS :8888/v1/chat/WS
+// Relay between phone number SMS text and websocket clients.
+require('./api/v1/chat/index.js');
 
 
 

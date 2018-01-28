@@ -1,29 +1,40 @@
-/*
-	GET: /chat
-		returns websocket stream connection
-			triggers websocket update with total users
+/*	
+	REQUIRES:
+		npm twillio
+		npm sockjs
+		process.secret
+		process.http
+		process.app
 
-	POST: /twillio/sms/in
+	WS: :8888/v1/chat/WS
+		connects websocket stream
+			triggers websocket push with total users
+
+	POST: /v1/chat/SMS
 		accepts SMS text data
 		returns success header
-			triggers websocket update with this data
+			triggers websocket push with this data
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TWILIO
-process.twilio = require('twilio')(process.secret.twilio.sid, process.secret.twilio.token);
+const twillio = require('twilio')(process.secret.twilio.sid, process.secret.twilio.token);
 // WS
-process.ws = require('sockjs').createServer({ sockjs_url: '' });
-process.wsClients = {};
-process.wsClientsLength = 0;
+const sockJS = require('sockjs');
+const ws = sockJS.createServer({ sockjs_url: '' });
+const wsServer = require('http').createServer();
+ws.installHandlers(wsServer, {prefix:'/v1/chat/WS'});
+wsServer.listen(1101);
+const wsClients = {};
+let wsClientsLength = 0;
 
 // WS CONNECTED
-process.ws.on('connection', function(conn) {
+ws.on('connection', function(conn) {
 	process.console.info('new user connected: '+conn.id);
 	// new user
-	process.wsClients[conn.id] = conn;
-	process.wsClients[conn.id].user = {}; // we must find out!
-	process.wsClientsLength++;
+	wsClients[conn.id] = conn;
+	wsClients[conn.id].user = {}; // we must find out!
+	wsClientsLength++;
 
 	/*
 		WS NOTIFY USERS
@@ -31,17 +42,17 @@ process.ws.on('connection', function(conn) {
 	*/
 	var users = {};
 	var ui = 0;
-	for (var c in process.wsClients){
+	for (var c in wsClients){
 		ui++;
-		users[c] = process.wsClients[c].user || {};
+		users[c] = wsClients[c].user || {};
 	}
 	// alert users
 	if (ui) {
 		var metaData = {
 			users
 		};
-		for (var client in process.wsClients){
-			process.wsClients[client].write(JSON.stringify(metaData));
+		for (var client in wsClients){
+			wsClients[client].write(JSON.stringify(metaData));
 		}
 	}
 
@@ -51,7 +62,7 @@ process.ws.on('connection', function(conn) {
 	conn.on('data', function(msgData) {
 		msgData = JSON.parse(msgData);
 		/*
-			msgData: {
+			type msgData: {
 				message: String,
 				user: {
 					ip: string
@@ -60,8 +71,7 @@ process.ws.on('connection', function(conn) {
 			}
 		*/
 		if (msgData.user) {
-			process.wsClients[conn.id].user = msgData.user;
-			// process.console.warn('user info received '+conn.id+" "+JSON.stringify(msgData.user));
+			wsClients[conn.id].user = msgData.user;
 		}
 		if (msgData.message) {
 		
@@ -69,9 +79,9 @@ process.ws.on('connection', function(conn) {
 				WS CALL HOME
 				* text Paul the message
 			*/
-			process.twilio.messages
+			twillio.messages
 			.create({
-				body: (process.wsClients[conn.id].user ? process.wsClients[conn.id].user.name+" " : "") + msgData.message,
+				body: (wsClients[conn.id].user ? wsClients[conn.id].user.name+" " : "") + msgData.message,
 				to: process.secret.twilio.toPhoneNumber,
 				from: process.secret.twilio.fromPhoneNumber
 			})
@@ -82,8 +92,8 @@ process.ws.on('connection', function(conn) {
 				WS COPY USERS
 				* tell everyone what someone said
 			*/
-			for (var client in process.wsClients){
-				process.wsClients[client].write(JSON.stringify(msgData));
+			for (var client in wsClients){
+				wsClients[client].write(JSON.stringify(msgData));
 			}
 			
 		}
@@ -91,8 +101,8 @@ process.ws.on('connection', function(conn) {
 
 	// WS CLIENT DISCONNECTED
 	conn.on('close', function() {
-	  delete process.wsClients[conn.id];
-	  process.wsClientsLength--;
+	  delete wsClients[conn.id];
+	  wsClientsLength--;
 
 	  /*
 	  	WS NOTIFY USERS
@@ -101,36 +111,28 @@ process.ws.on('connection', function(conn) {
 	  // make note of existing users
 	  var users = {};
 	  var ui = 0;
-	  for (var c in process.wsClients){
+	  for (var c in wsClients){
 		  ui++;
-		  users[c] = process.wsClients[c].user || {};
+		  users[c] = wsClients[c].user || {};
 	  }
 	  // alert users
 	  if (ui) {
 		  var metaData = {
 			  users
 		  };
-		  for (var client in process.wsClients){
-			  process.wsClients[client].write(JSON.stringify(metaData));
+		  for (var client in wsClients){
+			  wsClients[client].write(JSON.stringify(metaData));
 		  }
 	  }
 	});
 	
 });
-// WS START
-var ws = process.http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.write('chat room ready');
-  res.end();
-});
-process.ws.installHandlers(ws, {prefix:'/chat'});
-ws.listen(8888);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TWILIO RECEIVED
-process.app.post('/twilio/sms/in', function(request, response) {
+process.app.post('/v1/chat/SMS', function(request, response) {
 	var msgData = {
 		message: request.body.Body,
 		user: {
@@ -142,8 +144,8 @@ process.app.post('/twilio/sms/in', function(request, response) {
 		WS SAY THE WORD
 		* tell users what Paul responded
 	*/
-	for (var client in process.wsClients){
-		process.wsClients[client].write(JSON.stringify(msgData));
+	for (var client in wsClients){
+		wsClients[client].write(JSON.stringify(msgData));
 	}
 
 	// success response
