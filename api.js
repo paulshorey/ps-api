@@ -19,7 +19,7 @@ process.app.use(process.inc.express_parser.urlencoded({
 	parameterLimit: 10000,
 	extended: true
 }));
-process.app.use(process.inc.express.static('public'));
+process.app.use(process.inc.express.static('api_public'));
 process.app.disable('trust proxy');
 process.app.use(function(request, response, next){
 	var referrer = process.url.parse(request.headers.referer||'', true, true).hostname;
