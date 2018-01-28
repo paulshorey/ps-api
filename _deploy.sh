@@ -6,5 +6,4 @@ cd /www/ps-api
 git reset HEAD -\-hard;
 git pull
 
-killall node
-reboot
+pm2 restart all 
