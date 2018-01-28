@@ -4,7 +4,7 @@ exports.module = process.console = require('./src/console.js').module;
 
 
 
-process.app.get('/v1/console', function(request, response) {
+process.app.get('/v1/console/test', function(request, response) {
 
     var domain = request.protocol + '://' + request.get('host');
 
