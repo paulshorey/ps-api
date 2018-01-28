@@ -12,7 +12,7 @@
 const sockJS = require('sockjs');
 const ws = sockJS.createServer({ sockjs_url: '' });
 const wsServer = require('http').createServer();
-ws.installHandlers(wsServer, {prefix:'/v1/cconsole/WS'});
+ws.installHandlers(wsServer, {prefix:'/v1/console/WS'});
 wsServer.listen(1102);
 const wsClients = {};
 let wsClientsLength = 0;
