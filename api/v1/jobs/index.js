@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // RECEIVE POST DATA
-process.app.get('/v1/jobs/apify-client', function(request, response) {
+process.app.get('/v1/jobs/all', function(request, response) {
 
-    // "https://api.apify.com/v1/execs/eoySKuYBwdArZdTTD/results";
+    process.jobsDB = process.jobsDB || {};
     
     // success response
     response.setHeader('Content-Type', 'application/json');
     response.writeHead(200);
-    response.write(JSON.stringify({data:[], error:0},null,"\t"));
+    response.write(JSON.stringify({data:process.jobsDB, error:0},null,"\t"));
     response.end();
 
 });
@@ -24,10 +24,6 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
     if (!request.body._id) {
         request.body._id = "tgY7FtsXTgbjBrd5R";
     }
-
-    // simply save to memory
-    // bad idea for a real app, but I'll use this for a temporary solution, AND to practice Javascript data structures
-    // process.jobsDB = process.jobsDB || {};
 
     // fetch data
     const resultsUrl = "https://api.apify.com/v1/execs/"+request.body._id+"/results";
@@ -65,14 +61,23 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
 
 const processJobs = function(results){
 
+    // simply save to memory
+    // bad idea for a real app, but I'll use this for a temporary solution, AND to practice Javascript data structures
+    process.jobsDB = process.jobsDB || {};
+
+    // format
     for (var r in results) {
-        for (var k in results[r]) {
-            if (typeof results[r][k] === "string") {
-                results[r][k] = results[r][k].replace(/\w/g, ' ');
-                results[r][k] = results[r][k].trim();
+        var res = results[r];
+        for (var k in res) {
+            if (typeof res[k] === "string") {
+                res[k] = res[k].replace(/\s/g, ' ');
+                res[k] = res[k].trim();
             }
         }
-        process.console.log(results[r]);
+        // filter
+        res.posted = process.chrono.parseDate(res.posted);
+        // save
+        process.jobsDB[ process.crypto.createHash('md5').update(res.name+" "+res.company).digest('hex') ] = res;
     }
 
     return results;

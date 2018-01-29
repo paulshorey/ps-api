@@ -6,10 +6,13 @@
   "scripts": {},
   "dependencies": {
     "body-parser": "latest",
+    "chrono-node": "^1.3.5",
     "colors": "latest",
+    "crypto": "^1.0.1",
     "express": "latest",
     "http": "latest",
     "https": "^1.0.0",
+    "moment": "^2.20.1",
     "request": "latest",
     "serve-static": "latest",
     "sockjs": "^0.3.19",
