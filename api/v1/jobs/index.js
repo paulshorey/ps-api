@@ -8,7 +8,7 @@ process.app.post('/v1/jobs', function(request, response) {
     process.jobsDB = process.jobsDB || {};
 
     // data
-    process.console.log(request);
+    process.console.log(request.body);
 
 	// success response
 	response.setHeader('Content-Type', 'application/json');
