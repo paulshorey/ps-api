@@ -14,7 +14,7 @@ document.body.prepend(div);
 
 
 
-var sock = new SockJS(':1102/v1/console/WS');
+var sock = new SockJS(window.location.hostname+':1102/v1/console/WS');
 
  sock.onopen = function() {
     var div = document.createElement("div");
