@@ -28,6 +28,13 @@ var sock = new SockJS(window.location.protocol+"//"+window.location.hostname+':1
     if (log.args) {
         for (var a in log.args) {
             log.args[a] = (log.args[a].replace ? log.args[a].replace(/"/g,'') : log.args[a]);
+            try {
+                var great = JSON.parse(log.args[a]);
+                if (great) {
+                    log.args[a] = great;
+                }
+            } catch(e) {
+            }
         }
     }
     var concise = {
@@ -42,7 +49,7 @@ var sock = new SockJS(window.location.protocol+"//"+window.location.hostname+':1
     };
     //  log.timestamp = new Date(log.timestamp);
     //  console.log('log', log);
-     console[log.title]('log', concise);
+     console[log.title](concise);
 
     var div = document.createElement("div");
     div.innerHTML = "<i>"+log.timestamp+"</i> <b>"+log.message+"</b>";
