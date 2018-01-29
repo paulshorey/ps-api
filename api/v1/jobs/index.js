@@ -66,11 +66,12 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
 const processJobs = function(results){
 
     for (var r in results) {
-        // if (typeof results[r] === "string") {
-        //     results[r] = results[r].replace(/\w/g, ' ');
-        //     results[r] = results[r].trim();
-        // }
-        process.console.log(typeof results[r]);
+        for (var k in results[r]) {
+            if (typeof results[r][k] === "string") {
+                results[r][k] = results[r][k].replace(/\w/g, ' ');
+                results[r][k] = results[r][k].trim();
+            }
+        }
         process.console.log(results[r]);
     }
 
