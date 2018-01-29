@@ -1,7 +1,7 @@
 #
 # Simple API Server
-Read more on setup and configuration:
-https://paulshorey.gitbooks.io/nginx-server-management/content/the-api.html
+Documenting setup and configuration for a Linux (Ubuntu) NodeJS/MongoDB/Nginx server here:
+https://paulshorey.gitbooks.io/node-js-nginx-and-linux-server-management/content/
 
 
 #
