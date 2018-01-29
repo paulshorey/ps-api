@@ -15,4 +15,4 @@ cd /www/ps-api
 git reset HEAD -\-hard;
 git pull
 
-pm2 start  api.js -i max
+pm2 start  api.js -i max -o ./api_public/v1/console/logfiles/_api_log.log -e ./api_public/v1/console/logfiles/_api_err.log

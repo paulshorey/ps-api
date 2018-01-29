@@ -2,4 +2,4 @@ sleep 20
 
 cd /www/ps-api
 
-pm2 start _deploy.js
+pm2 start _deploy.js -o ./api_public/v1/console/logfiles/_deploy_log.log -e ./api_public/v1/console/logfiles/_deploy_err.log

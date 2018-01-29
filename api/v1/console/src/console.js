@@ -43,9 +43,10 @@ const cconsole = require('tracer').colorConsole({
 	filters: {
 		trace: colors.white,
 		info: colors.green,
-		log: colors.blue,
+		log: colors.grey,
 		debug: colors.yellow,
 		warn: colors.yellow,
+		warning: colors.yellow,
 		error: colors.red
 	},
 	format: [
@@ -54,32 +55,51 @@ const cconsole = require('tracer').colorConsole({
 			error: "{{message}} \n({{file}}:{{line}})" // error format
 		}
 	],
-	dateformat: "HH:MM:ss.L",
+	dateformat: "ddd h:MM tt (Z)",
 	preprocess: function(data) {
-		for (var each in data.args) {
-			if (typeof data.args[each] == 'function') {
-				(function(callback) {
-					data.args[each] = callback.toString();
-				})(data.args[each]);
-			}
-			data.args[each] = ccstringify(data.args[each],null,'');
-			if (data.args[each]) {
-				data.args[each] = data.args[each].replace(/(?:\r\n|\r|\n)/g, '\t').replace(/\t/g, ' ');
-			}
-		}
+		// for (var each in data.args) {
+		// 	if (typeof data.args[each] == 'function') {
+		// 		(function(callback) {
+		// 			data.args[each] = callback.toString();
+		// 		})(data.args[each]);
+		// 	}
+		// 	data.args[each] = ccstringify(data.args[each],null,'');
+		// 	if (data.args[each]) {
+		// 		data.args[each] = data.args[each].replace(/(?:\r\n|\r|\n)/g, '\t').replace(/\t/g, ' ');
+		// 	}
+		// }
 	},
 	transport: function(data) {
-		console.log(data.output);
-	
-			for (var client in wsClients){
-				wsClients[client].write(JSON.stringify(data));
-			}
+		switch(data.title) {
+			case "info":
+			break;
+			case "warn":
+			case "warning":
+				data.title = "warn";
+			break;
+			case "error":
+			break;
+			default:
+				data.title = "log";
+			break;
+		}
 
-	},
+		// output to console
+		console[data.title](data.output);
+
+		// output to WS
+		for (var client in wsClients){
+			wsClients[client].write(JSON.stringify(data));
+		}
+
+	}/*,
 	ws: function(message, status) {
 		// skip banal debug logs
 		if (status=='debug') {
 			return false;
+		}
+		if (status=='warn') {
+			status = 'warning';
 		}
 		if (typeof message === 'object' || typeof message === 'function') {
 			message = JSON.stringify(message, null, ' ');
@@ -93,7 +113,7 @@ const cconsole = require('tracer').colorConsole({
 				message: message
 			}));
 		}
-	}
+	}*/
 });
 // error
 process.on('uncaughtException', function(err) {
@@ -159,4 +179,4 @@ const ccstringify = function(obj, replacer, indent) {
 
 
 
-exports.module = { log:cconsole.log , info:cconsole.info, warning:cconsole.warning, error:cconsole.error };
+exports.module = { log:cconsole.log , info:cconsole.info, warn:cconsole.warn, warning:cconsole.warning, error:cconsole.error };

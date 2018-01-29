@@ -48,7 +48,6 @@ process.console = console;
 // POST /v1/console/command (postData: { key: {process.secret.console.key, command: "" })
 // replace standard {console.log} with advanced {process.console.log}, which distributes via webslocket connection to a self-spawned html app.
 process.console = require("./api/v1/console").module;
-process.console.info(process.secret);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
