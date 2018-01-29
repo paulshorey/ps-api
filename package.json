@@ -9,6 +9,7 @@
     "colors": "latest",
     "express": "latest",
     "http": "latest",
+    "https": "^1.0.0",
     "request": "latest",
     "serve-static": "latest",
     "sockjs": "^0.3.19",
