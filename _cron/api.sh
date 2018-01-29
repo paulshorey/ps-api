@@ -13,6 +13,7 @@ eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/gitlab
 cd /www/ps-api
 git reset HEAD -\-hard;
-git pull
+git pull;
 
+mkdir ./api_public/v1/console/logfiles;
 pm2 start  api.js -i max -o ./api_public/v1/console/logfiles/_api_log.log -e ./api_public/v1/console/logfiles/_api_err.log
