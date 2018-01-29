@@ -61,17 +61,17 @@ const cconsole = require('tracer').colorConsole({
 	transport: function(data) {
 
 		// fix "circular structure" to be JSON friendly
-		for (var each in data.args) {
-			if (typeof data.args[each] == 'function') {
-				(function(callback) {
-					data.args[each] = callback.toString();
-				})(data.args[each]);
-			}
-			data.args[each] = ccstringify(data.args[each],null,'');
-			if (data.args[each]) {
-				data.args[each] = data.args[each].replace(/(?:\r\n|\r|\n)/g, '\t').replace(/\t/g, ' ');
-			}
-		}
+		// for (var each in data.args) {
+		// 	if (typeof data.args[each] == 'function') {
+		// 		(function(callback) {
+		// 			data.args[each] = callback.toString();
+		// 		})(data.args[each]);
+		// 	}
+		// 	data.args[each] = ccstringify(data.args[each],null,'');
+		// 	if (data.args[each]) {
+		// 		data.args[each] = data.args[each].replace(/(?:\r\n|\r|\n)/g, '\t').replace(/\t/g, ' ');
+		// 	}
+		// }
 
 		// fix title
 		switch(data.title) {
