@@ -1,8 +1,31 @@
-// data store
+// persistent data store - really needs to be redone...
 // bad idea for a real app, but I'll use this for a temporary solution, AND to practice Javascript data structures
-process.jobsDB = process.jobsDB || {};
+// process.jobsDB = process.jobsDB || {};
+process.fs.open("/www/db/v1_jobs", 'wx', (err, fd) => {
+    if (err) {
+        if (err.code === 'EEXIST') {
+        // file exists
+        // read file to list
+        process.fs.readFile("/www/db/v1_jobs", 'utf8', function (err, data) {
+            if (err) { 
+                throw err; 
+            }
+            if (data) {
+                process.jobsDB = JSON.parse(data);
+            } else {
+                process.jobsDB = {};
+            }
+        });
 
+        return;
+        }
+    }
 
+    // file does not exist
+    // make it, write empty list
+    process.jobsDB = {};
+    process.fs.writeFile("/www/'db/v1_jobs", process.jobsDB);
+});
 
 
 
@@ -78,9 +101,18 @@ const processJobs = function(results){
         }
         // filter
         res.posted = process.chrono.parseDate(res.posted);
-        // save
+
+        // save to DB
         process.jobsDB[ process.crypto.createHash('md5').update(res.name+" "+res.company).digest('hex') ] = res;
     }
+
+    // pretending this is a db
+    process.fs.writeFile("/www/db/v1_jobs", JSON.stringify(process.jobsDB), function(err) {
+        if(err) {
+            return process.console.error(err);
+        }
+        process.console.info("The file was saved!");
+    });
 
     return results;
 
