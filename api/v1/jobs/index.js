@@ -66,7 +66,6 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
 const processJobs = function(results){
 
     for (var r in results) {
-        results[r] = (typeof results[r]);
         // if (typeof results[r] === "string") {
         //     results[r] = results[r].replace(/\w/g, ' ');
         //     results[r] = results[r].trim();
