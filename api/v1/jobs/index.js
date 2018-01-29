@@ -36,7 +36,11 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
 
             // finally...
             resultsData = JSON.parse(body);
-            process.console.log(resultsUrl, resultsData);
+            if (resultsData && resultsData[0] && resultsData[0].pageFunctionResult) {
+                process.console.log(resultsData[0].pageFunctionResult);
+            } else {
+                process.console.error("Apify-WEBHOOK FAILED to return data: "+resultsUrl);
+            }
 
         });
     });
