@@ -1,31 +1,14 @@
-// persistent data store - really needs to be redone...
-// bad idea for a real app, but I'll use this for a temporary solution, AND to practice Javascript data structures
-// process.jobsDB = process.jobsDB || {};
-process.fs.open("/www/db/v1_jobs", 'wx', (err, fd) => {
-    if (err) {
-        if (err.code === 'EEXIST') {
-        // file exists
-        // read file to list
-        process.fs.readFile("/www/db/v1_jobs", 'utf8', function (err, data) {
-            if (err) { 
-                throw err; 
-            }
-            if (data) {
-                process.jobsDB = JSON.parse(data);
-            } else {
-                process.jobsDB = {};
-            }
-        });
-
-        return;
+// data
+let jobsDB = {};
+if (process.fs.existsSync("/www/db/v1_jobs")) {
+    process.fs.readFile("/www/db/v1_jobs", 'utf8', function (err, data) {
+        if (data) {
+            jobsDB = JSON.parse(data);
         }
-    }
-
-    // file does not exist
-    // make it, write empty list
-    process.jobsDB = {};
-    process.fs.writeFile("/www/'db/v1_jobs", process.jobsDB);
-});
+    });
+} else {
+    process.fs.writeFile("/www/'db/v1_jobs", jobsDB);
+};
 
 
 
@@ -34,14 +17,25 @@ process.fs.open("/www/db/v1_jobs", 'wx', (err, fd) => {
 // RECEIVE POST DATA
 process.app.get('/v1/jobs/all', function(request, response) {
     
+    // format response
+    var data = Object.values(jobsDB);
+    data = filterJobs(data);
+    data.sort(function(a,b) {
+        return b.rating - a.rating;
+    });
+
     // success response
     response.setHeader('Content-Type', 'application/json');
     response.writeHead(200);
-    response.write(JSON.stringify({data:process.jobsDB, error:0},null,"\t"));
+    response.write(JSON.stringify({results: data.length, data:data, error:0},null,"\t"));
     response.end();
 
 });
 
+// sort and search
+var filterJobs = function(arr){
+    return arr;
+}
 
 
 
@@ -51,7 +45,7 @@ process.app.get('/v1/jobs/all', function(request, response) {
 process.app.post('/v1/jobs/apify-webhook', function(request, response) {
     // dev env
     if (!request.body._id) {
-        request.body._id = "tgY7FtsXTgbjBrd5R";
+        request.body._id = "D7BRpidKGMqHSPXeJ";
     }
 
     // fetch data
@@ -67,7 +61,9 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
             // finally...
             resultsData = JSON.parse(body);
             if (resultsData && resultsData[0] && resultsData[0].pageFunctionResult) {
-                processJobs(resultsData[0].pageFunctionResult);
+                for (var rD in resultsData) {
+                    processJobs(resultsData[rD].pageFunctionResult);
+                }
             } else {
                 process.console.error("Apify-WEBHOOK FAILED to return data: "+resultsUrl);
             }
@@ -83,11 +79,7 @@ process.app.post('/v1/jobs/apify-webhook', function(request, response) {
 
 });
 
-
-
-
-
-
+// magic
 const processJobs = function(results){
 
     // format
@@ -102,12 +94,82 @@ const processJobs = function(results){
         // filter
         res.posted = process.chrono.parseDate(res.posted);
 
+        // rating
+        res.rating = 100000;
+
+        // [ - ] location
+        if (/, IN|, OH|, VA|, FL|, SC|, NC|, MD|, MO|, WI|, MN|, IL/i.test(res.location)) {
+            continue;
+        }
+
+        // [ + ] location
+        if (/San Diego|South Jordan|Draper, UT|remote|denver|phoenix/i.test(res.location)) {
+            res.rating += 5000;
+        }
+        if (/, CA|, AZ|, UT|, CO|, ID|remote/i.test(res.location)) {
+            res.rating += 1000;
+        }
+        if (/New York|Philadelphia/i.test(res.location)) {
+            res.rating += 500;
+        }
+
+        // [ - ] text
+        if (/entry level|junior|intern/i.test(res.name) && ! (/mid|senior/i.test(res.name))) { // in NAME, exclusive
+            continue;
+        }
+        if (/full stack/i.test(res.name)) { // in NAME
+            res.rating -= 1000;
+        }
+        if (/ASP\.NET|client|full stack|entry level/i.test(res.text)) { 
+            res.rating -= 1000;
+        }
+        if (/software/i.test(res.name) || /angular/i.test(res.text) && ! (/react/i.test(res.text)) ) { // 1 in NAME or 2,3 exclusive
+            res.rating -= 1000;
+        }
+        if (/Java/i.test(res.text) && /JSP/i.test(res.text)) { // both match
+            res.rating -= 1000;
+        }
+        if (/TDD|test driven/i.test(res.text)) { // nothing against normal strategy of unit-testing to make sure stuff doesn't break... lets talk!
+            res.rating -= 750;
+        }
+        if (/synergy|financial|bank|invest|account|lend|credit union|drupal|joomla/i.test(res.text)) { // ok with fin-tech, just don't want to work at a bank
+            res.rating -= 500;
+        }
+        if ( ! (/html|css|sass|style/i.test(res.text)) ) { // !
+            res.rating -= 250;
+        }
+        if ( ! (/front/i.test(res.text)) ) { // !
+            res.rating -= 125;
+        }
+
+        // [ + ] text
+        if (/front|ui/i.test(res.name)) { // in NAME
+            res.rating += 2000;
+        }
+        if (/ux/i.test(res.name)) { // in NAME
+            res.rating += 1000;
+        }
+        if (/react|es6|ui/i.test(res.text)) {
+            res.rating += 1000;
+        }
+        if (/react|es6|node|front|ux|art|music|design/i.test(res.text)) {
+            res.rating += 500;
+        }
+        if (/flexible|php|ux|designer|illustrator|responsive/i.test(res.text)) {
+            res.rating += 250;
+        }
+        if (/iot|embedded/i.test(res.location)) {
+            res.rating += 125;
+        }
+
+
         // save to DB
-        process.jobsDB[ process.crypto.createHash('md5').update(res.name+" "+res.company).digest('hex') ] = res;
+        res._id = process.crypto.createHash('md5').update(res.name+" "+res.company).digest('hex');
+        jobsDB[ res._id ] = res;
     }
 
     // pretending this is a db
-    process.fs.writeFile("/www/db/v1_jobs", JSON.stringify(process.jobsDB), function(err) {
+    process.fs.writeFile("/www/db/v1_jobs", JSON.stringify(jobsDB), function(err) {
         if(err) {
             return process.console.error(err);
         }
