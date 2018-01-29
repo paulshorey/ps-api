@@ -29,7 +29,7 @@ ws.on('connection', function(conn) {
 	// });
 	// WS CLIENT DISCONNECTED
 	conn.on('close', function() {
-	delete wsClients[conn.id];
+		delete wsClients[conn.id];
 	});
 });
 

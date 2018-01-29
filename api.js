@@ -7,7 +7,6 @@ process.http = require('http');
 process.https = require('https');
 process.url = require('url');
 process.crypto = require('crypto');
-process.moment = require('moment');
 process.chrono = require('chrono-node');
 // env (settings)
 process.env.PATH = __dirname;
@@ -41,8 +40,6 @@ process.app.use(function(request, response, next){
 });
 // secrets
 process.secret = require('../secret/all.js'); // not on GitHub!
-process.console = console;
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
