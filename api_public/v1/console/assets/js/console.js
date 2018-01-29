@@ -25,8 +25,10 @@ var sock = new SockJS(window.location.protocol+"//"+window.location.hostname+':1
 
  sock.onmessage = function(e) {
     var log = JSON.parse(e.data);
-    for (var a in log.args) {
-        log.args[a] = log.args[a].replace(/"/g,'');
+    if (log.args) {
+        for (var a in log.args) {
+            log.args[a] = (log.args[a].replace ? log.args[a].replace(/"/g,'') : log.args[a]);
+        }
     }
     var concise = {
         message: log.args[0],
@@ -39,6 +41,7 @@ var sock = new SockJS(window.location.protocol+"//"+window.location.hostname+':1
         trace_level: log.level
     };
     //  log.timestamp = new Date(log.timestamp);
+    //  console.log('log', log);
      console[log.title]('log', concise);
 
     var div = document.createElement("div");
