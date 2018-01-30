@@ -37,10 +37,10 @@ http://paulshorey.com
 ## 
 ## Console  
 NodeJS /api/v1/console/src/console.js websocket connection at port :1102/v1/console/WS  
-http://api.paulshorey.com:1080/v1/console/
+http://api.paulshorey.com/v1/console/
 
 ## 
 ## Jobs 
-APIFY service crawls Indeed.com and Careerbuilder.com, nationwide, searching for "javascript". It returns 1000 results from Indeed and 500+ from Careerbuilder. After the crawl is done, this server is notified at POST __/v1/jobs/apify-webhook__. Then, this server goes and fetches the new results from APIFY's server. Wish the webhook would just send this data, but whatever... Then, the results are filtered, made unique, and rated. Then, a GET request to __/v1/jobs/all__ spits out a sorted array of jobs in JSON format.  
+APIFY service crawls Indeed.com and Careerbuilder.com, nationwide, searching for "javascript". It returns 1000 results from Indeed and 500+ from Careerbuilder. After the crawl is done, this server is notified at POST __/v1/jobs/apify-webhook__. Then, this server goes and fetches the new results from APIFY's server. Wish the webhook would just send this data, but whatever... Then, the results are filtered, made unique, and rated. Then, a GET request to http://api.paulshorey.com/v1/jobs/all spits out a sorted array of jobs in JSON format.  
 
 
