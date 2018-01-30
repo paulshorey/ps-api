@@ -21,9 +21,6 @@ process.app.get('/v1/jobs/all', function(request, response) {
     
     // format response
     var data = Object.values(jobsDB);
-    data.sort(function(a,b) {
-        return b._rating - a._rating;
-    });
 
     // filter
     if (request.query) {
@@ -35,6 +32,11 @@ process.app.get('/v1/jobs/all', function(request, response) {
             });
         }
     }
+
+    // sort
+    data.sort(function(a,b) {
+        return b._rating - a._rating;
+    });
 
     // success response
     response.setHeader('Content-Type', 'application/json');
