@@ -1,4 +1,6 @@
-// data
+// My pretend DB
+// It returns an object with key-value pairs. Key is the unique hash generated from the job listing's title and company. 
+// I'll then convert it to array and practice filtering and work with data :)
 let jobsDB = {};
 if (process.fs.existsSync("/www/db/v1_jobs")) {
     process.fs.readFile("/www/db/v1_jobs", 'utf8', function (err, data) {
@@ -14,15 +16,25 @@ if (process.fs.existsSync("/www/db/v1_jobs")) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// RECEIVE POST DATA
+// GET JOBS
 process.app.get('/v1/jobs/all', function(request, response) {
     
     // format response
     var data = Object.values(jobsDB);
-    data = filterJobs(data);
     data.sort(function(a,b) {
-        return b.rating - a.rating;
+        return b._rating - a._rating;
     });
+
+    // filter
+    if (request.query) {
+        var query = request.query;
+        for (var param in query) {
+            var qRegEx = new RegExp(query[param], "i"); // I like RegExp! Not most efficient, but ok for a site with one user  :)
+            data = data.filter(function(job) {
+                return qRegEx.test(job[param]); // Don't think you can inject malicious code from a URI variable into a RegExpression. Can you?
+            });
+        }
+    }
 
     // success response
     response.setHeader('Content-Type', 'application/json');
@@ -32,16 +44,34 @@ process.app.get('/v1/jobs/all', function(request, response) {
 
 });
 
-// sort and search
-var filterJobs = function(arr){
-    return arr;
-}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// EDIT JOB
+process.app.put('/v1/job', function(request, response) {
+
+    var query = request.body;
+
+    if (jobsDB[query._id]) {
+        for (var param in query) {
+            jobsDB[query._id][param] = query[param];
+        }
+    }
+    
+    // success response
+    response.setHeader('Content-Type', 'application/json');
+    response.writeHead(200);
+    response.write(JSON.stringify({data:"ok", error:0},null,"\t"));
+    response.end();
+
+});
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// RECEIVE POST DATA
+// ADD MORE JOBS
 process.app.post('/v1/jobs/apify-webhook', function(request, response) {
     // dev env
     if (!request.body._id) {
@@ -95,7 +125,7 @@ const processJobs = function(results){
         res.posted = process.chrono.parseDate(res.posted);
 
         // rating
-        res.rating = 100000;
+        res._rating = 100000;
 
         // [ - ] location
         if (/, IN|, OH|, VA|, FL|, SC|, NC|, MD|, MO|, WI|, MN|, IL/i.test(res.location)) {
@@ -104,13 +134,13 @@ const processJobs = function(results){
 
         // [ + ] location
         if (/San Diego|South Jordan|Draper, UT|remote|denver/i.test(res.location)) {
-            res.rating += 5000;
+            res._rating += 2000;
         }
-        if (/, CA|, AZ|, UT|, CO|, ID|remote/i.test(res.location)) {
-            res.rating += 1000;
+        if (/, CA|, AZ|, UT|, CO|, ID/i.test(res.location)) {
+            res._rating += 1000;
         }
         if (/New York|Philadelphia|phoenix/i.test(res.location)) {
-            res.rating += 1000;
+            res._rating += 1000;
         }
 
         // [ - ] text
@@ -118,52 +148,59 @@ const processJobs = function(results){
             continue;
         }
         if (/full stack/i.test(res.name)) { // in NAME
-            res.rating -= 1000;
+            res._rating -= 1000;
         }
         if (/ASP\.NET|client|full stack|entry level/i.test(res.text)) { 
-            res.rating -= 1000;
+            res._rating -= 1000;
         }
         if (/software/i.test(res.name) || (/angular/i.test(res.text) && ! (/react/i.test(res.text))) ) { // 1 in NAME or 2,3 exclusive
-            res.rating -= 1000;
+            res._rating -= 1000;
         }
         if (/Java/i.test(res.text) && /JSP/i.test(res.text)) { // both match
-            res.rating -= 1000;
+            res._rating -= 1000;
         }
         if (/TDD|test driven/i.test(res.text)) { // nothing against normal strategy of unit-testing to make sure stuff doesn't break... lets talk!
-            res.rating -= 750;
+            res._rating -= 750;
         }
         if (/synergy|financial|bank|invest|account|lend|credit union|drupal|joomla/i.test(res.text)) { // ok with fin-tech, just don't want to work at a bank
-            res.rating -= 500;
+            res._rating -= 500;
         }
-        if ( ! (/html|css|sass|style/i.test(res.text)) ) { // !
-            res.rating -= 250;
-        }
-        if ( ! (/front/i.test(res.text)) ) { // !
-            res.rating -= 125;
+        if ( ! (/html|css|sass|style|front/i.test(res.text)) ) { // !
+            res._rating -= 250;
         }
 
         // [ + ] text
         if (/front|ui/i.test(res.name)) { // in NAME
-            res.rating += 2000;
+            res._rating += 2000;
         }
         if (/ux/i.test(res.name)) { // in NAME
-            res.rating += 1000;
+            res._rating += 1000;
         }
         if (/react|es6|ui/i.test(res.text)) {
-            res.rating += 1000;
+            res._rating += 1000;
         }
-        if (/react|es6|node|front|ux|art|music|design/i.test(res.text)) {
-            res.rating += 500;
+        if (/react|es6|node|front|ux|art|music|design|flexible/i.test(res.text)) {
+            res._rating += 500;
         }
-        if (/flexible|php|ux|designer|illustrator|responsive/i.test(res.text)) {
-            res.rating += 250;
-        }
-        if (/iot|embedded/i.test(res.location)) {
-            res.rating += 125;
+        if (/iot|embedded|php|ux|designer|illustrator|responsive/i.test(res.text)) {
+            res._rating += 250;
         }
 
+        // _rating to _stars
+        if (res._rating > 105000) {
+            res._stars = 5;
+        } else if (res._rating > 103000) {
+            res._stars = 4;
+        } else if (res._rating > 101000) {
+            res._stars = 3;
+        } else if (res._rating > 99000) {
+            res._stars = 2;
+        } else {
+            res._stars = 1;
+        }
 
         // save to DB
+        res._status = "new";
         res._id = process.crypto.createHash('md5').update(res.name+" "+res.company).digest('hex');
         jobsDB[ res._id ] = res;
     }
@@ -173,7 +210,7 @@ const processJobs = function(results){
         if(err) {
             return process.console.error(err);
         }
-        process.console.info("The file was saved!");
+        process.console.info("/www/db/v1_jobs file updated");
     });
 
     return results;

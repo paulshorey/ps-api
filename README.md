@@ -21,29 +21,31 @@ Those system scripts start these Node.js scripts:
 ## 
 ## API requests  
 NodeJS /api.js process listens for REST requests {port 80 rerouted to port 1080}  
-See https://github.com/paulshorey/ps-api/blob/master/api.js  
+**See** https://github.com/paulshorey/ps-api/blob/master/api.js  
 
 ## 
 ## Deploy  
 NodeJS /\_deploy.js process listens for POST request at port :9999/\_deploy  
-See https://github.com/paulshorey/ps-api/blob/master/_deploy.js  
+**See** https://github.com/paulshorey/ps-api/blob/master/_deploy.js  
 
 ## 
 ## Chat  
 NodeJS /api/v1/chat websocket connection at port :1101/v1/chat/WS  
 http://paulshorey.com  
-See https://github.com/paulshorey/ps-api/blob/master/api/v1/chat/index.js  
+**See** https://github.com/paulshorey/ps-api/blob/master/api/v1/chat/index.js  
 
 ## 
 ## Console  
 NodeJS /api/v1/console/src/console.js websocket connection at port :1102/v1/console/WS  
-http://api.paulshorey.com/v1/console/
-See https://github.com/paulshorey/ps-api/blob/master/api/v1/console/src/console.js  
-And https://github.com/paulshorey/ps-api/blob/master/api_public/v1/console/assets/js/console.js  
+http://api.paulshorey.com/v1/console/  
+**See** https://github.com/paulshorey/ps-api/blob/master/api/v1/console/src/console.js  
+**And** https://github.com/paulshorey/ps-api/blob/master/api_public/v1/console/assets/js/console.js  
 
 ## 
 ## Jobs 
-APIFY service crawls Indeed.com and Careerbuilder.com, nationwide, searching for "javascript". It returns 1000 results from Indeed and 500+ from Careerbuilder. After the crawl is done, this server is notified at POST __/v1/jobs/apify-webhook__. Then, this server goes and fetches the new results from APIFY's server. Wish the webhook would just send this data, but whatever... Then, the results are filtered, made unique, and rated. Then, a GET request to http://api.paulshorey.com/v1/jobs/all spits out a sorted array of jobs in JSON format.   
-See https://github.com/paulshorey/ps-api/blob/master/api/v1/jobs/index.js  
+APIFY service crawls Indeed.com and Careerbuilder.com, nationwide, searching for "javascript". It returns 1000 results from each. After the crawl is done, this server is notified at POST __/v1/jobs/apify-webhook__. Then, this server goes and fetches the new results from APIFY's server. Wish the webhook would just send this data, but whatever... Then, the results are filtered, made unique, and rated. Then, a GET request to http://api.paulshorey.com/v1/jobs/all spits out a sorted array of jobs in JSON format.   
+**See** https://github.com/paulshorey/ps-api/blob/master/api/v1/jobs/index.js  
+**And endpoint** http://api.paulshorey.com/v1/jobs/all  
+**And work in progress demo** http://paulshorey.com/jobs/  
 
 
