@@ -11,7 +11,7 @@ bash /www/ps-api/_cron/api.sh
 ```  
 Those system scripts start these Node.js scripts:  
 ```
-{codebase}/_deploy.js  // this listens for webhook request from Github, then pulls and restarts processes
+{codebase}/_deploy.js  // this listens for webhook from Github, pulls, and restarts node processes
 {codebase}/api.js  // this is the app, using Node.js and Express  
 ```  
 
