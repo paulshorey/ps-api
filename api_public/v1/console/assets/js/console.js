@@ -1,11 +1,11 @@
 
 var div = document.createElement("div");
-div.innerHTML = "<i>https://github.com/paulshorey/ps-api/blob/master/api/v1/console/src/console.js</i> <b>As my server generates console.log() or console.warn() messages, they will be output here, in real time! Yes, I know about `node app.js --inspector`, and am also using logfiles. But this is mobile friendly, and lets me check on my server anytime from anywhere! Yes, it would be bad for production, so if everything is running smoothly, this feature would be turned off.</b>";
+div.innerHTML = "<i>https://github.com/paulshorey/ps-api/blob/master/api/v1/console/src/console.js</i> <b>As this server generates console.log() or console.warn() messages, they will be output here, in real time! Yes, I know about `node app.js --inspector`, and am also using logfiles. But this is mobile friendly, and lets me check on my remote servers anytime from anywhere! Yes, it would be bad for production, so when the code is no longer experimental, this feature will be turned off.</b>";
 div.className = "line log";
 document.body.prepend(div);
 
 var div = document.createElement("div");
-div.innerHTML = "<i>Welcome!</i> <b>This is a demo - for my server-side real-time console logging experiment. It will be password-protected soon. Meanwhile, please don't hack me - that's not nice!</b>";
+div.innerHTML = "<i>Welcome!</i> <b>This is a demo - for my server-side real-time console/dashboard experiment. It will be password-protected soon. Meanwhile, please don't hack me - that's not nice!</b>";
 div.className = "line info";
 document.body.prepend(div);
 

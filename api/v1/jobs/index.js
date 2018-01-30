@@ -103,14 +103,14 @@ const processJobs = function(results){
         }
 
         // [ + ] location
-        if (/San Diego|South Jordan|Draper, UT|remote|denver|phoenix/i.test(res.location)) {
+        if (/San Diego|South Jordan|Draper, UT|remote|denver/i.test(res.location)) {
             res.rating += 5000;
         }
         if (/, CA|, AZ|, UT|, CO|, ID|remote/i.test(res.location)) {
             res.rating += 1000;
         }
-        if (/New York|Philadelphia/i.test(res.location)) {
-            res.rating += 500;
+        if (/New York|Philadelphia|phoenix/i.test(res.location)) {
+            res.rating += 1000;
         }
 
         // [ - ] text
@@ -123,7 +123,7 @@ const processJobs = function(results){
         if (/ASP\.NET|client|full stack|entry level/i.test(res.text)) { 
             res.rating -= 1000;
         }
-        if (/software/i.test(res.name) || /angular/i.test(res.text) && ! (/react/i.test(res.text)) ) { // 1 in NAME or 2,3 exclusive
+        if (/software/i.test(res.name) || (/angular/i.test(res.text) && ! (/react/i.test(res.text))) ) { // 1 in NAME or 2,3 exclusive
             res.rating -= 1000;
         }
         if (/Java/i.test(res.text) && /JSP/i.test(res.text)) { // both match
