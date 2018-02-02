@@ -161,9 +161,6 @@ const processJobs = function(results){
         if (/Java/i.test(res.text) && /JSP/i.test(res.text)) { // both match
             res._rating -= 1000;
         }
-        if (/TDD|test driven/i.test(res.text)) { // nothing against normal strategy of unit-testing to make sure stuff doesn't break... lets talk!
-            res._rating -= 750;
-        }
         if (/synergy|financial|bank|invest|account|lend|credit union|drupal|joomla/i.test(res.text)) { // ok with fin-tech, just don't want to work at a bank
             res._rating -= 500;
         }
