@@ -14,6 +14,10 @@ ssh-add ~/.ssh/gitlab
 cd /www/ps-api
 git reset HEAD -\-hard;
 git pull;
+npm install;
 
+mkdir ./api_public;
+mkdir ./api_public/v1;
+mkdir ./api_public/v1/console;
 mkdir ./api_public/v1/console/logfiles;
 pm2 start  api.js -i max -o ./api_public/v1/console/logfiles/_api_log.log -e ./api_public/v1/console/logfiles/_api_err.log
