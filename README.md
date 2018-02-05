@@ -26,17 +26,20 @@ NodeJS /api.js process listens for REST requests {port 80 rerouted to port 1080}
 ## 
 ## Deploy  
 NodeJS /\_deploy.js process listens for POST request at port :9999/\_deploy  
+(Whenever the master branch has been pushed in GitHub, the server pulls and installs new code)  
 * **Code** https://github.com/paulshorey/ps-api/blob/master/_deploy.js  
 
 ## 
 ## WS, POST: Chat  
 NodeJS /api/v1/chat websocket connection at port :1101/v1/chat/WS  
+(Chat with me from my website - to my phone SMS.)  
 * **Demo** http://paulshorey.com  
 * **Code** https://github.com/paulshorey/ps-api/blob/master/api/v1/chat/index.js  
 
 ## 
 ## WS, GET: Console  
 NodeJS /api/v1/console/src/console.js websocket connection at port :1102/v1/console/WS  
+(This intercepts system console.log statements, and color codes them for the console, or transmitts them over a web-socket connection to the debug app, for now this demo, with nothing going on.)  
 * **Demo** http://api.paulshorey.com/v1/console/  
 * **Code** https://github.com/paulshorey/ps-api/blob/master/api/v1/console/src/console.js  
 * **Code** https://github.com/paulshorey/ps-api/blob/master/api_public/v1/console/assets/js/console.js  

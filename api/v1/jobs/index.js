@@ -2,14 +2,18 @@
 // It returns an object with key-value pairs. Key is the unique hash generated from the job listing's title and company. 
 // I'll then convert it to array and practice filtering and work with data :)
 let jobsDB = {};
-if (process.fs.existsSync("/www/db/v1_jobs")) {
-    process.fs.readFile("/www/db/v1_jobs", 'utf8', function (err, data) {
+const jobsDB_file = "/www/db/v1_jobs";
+if (!process.fs.existsSync("/www/db")){
+    process.fs.mkdirSync("/www/db");
+}
+if (process.fs.existsSync(jobsDB_file)) {
+    process.fs.readFile(jobsDB_file, 'utf8', function (err, data) {
         if (data) {
             jobsDB = JSON.parse(data);
         }
     });
 } else {
-    process.fs.writeFile("/www/'db/v1_jobs", jobsDB);
+    process.fs.writeFile(jobsDB_file, jobsDB);
 };
 
 
@@ -205,7 +209,7 @@ const processJobs = function(results){
     }
 
     // pretending this is a db
-    process.fs.writeFile("/www/db/v1_jobs", JSON.stringify(jobsDB), function(err) {
+    process.fs.writeFile(jobsDB_file, JSON.stringify(jobsDB), function(err) {
         if(err) {
             return process.console.error(err);
         }
