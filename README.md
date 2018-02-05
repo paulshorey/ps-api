@@ -31,7 +31,7 @@ NodeJS /\_deploy.js process listens for POST request at port :9999/\_deploy
 ## 
 ## WS, POST: Chat  
 NodeJS /api/v1/chat websocket connection at port :1101/v1/chat/WS  
-http://paulshorey.com  
+* **Demo** http://paulshorey.com  
 * **Code** https://github.com/paulshorey/ps-api/blob/master/api/v1/chat/index.js  
 
 ## 
