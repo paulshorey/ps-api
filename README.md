@@ -4,16 +4,9 @@
 Setup and configuration for this and any Linux (Ubuntu) NodeJS/MongoDB/Nginx server explained here:
 https://paulshorey.gitbooks.io/node-js-nginx-and-linux-server-management/content/  
 ### 
-This is run on system startup (explained in the above link, in /etc/crontab):  
-```
-bash /www/ps-api/_cron/deploy.sh  
-bash /www/ps-api/_cron/api.sh  
-```  
-Those system scripts start these Node.js scripts:  
-```
-{codebase}/_deploy.js  // this listens for webhook from Github, pulls, and restarts node processes
-{codebase}/api.js  // this is the app, using Node.js and Express  
-```  
+  
+Probably will abandon prototyping apps on custom Linux servers from scratch, in favor of a BAAS. Playing around with Firebase now.  
+  
 
 # 
 # Primary functions of this server:  
