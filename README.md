@@ -5,8 +5,6 @@ Setup and configuration for this and any Linux (Ubuntu) NodeJS/MongoDB/Nginx ser
 https://paulshorey.gitbooks.io/node-js-nginx-and-linux-server-management/content/  
 ### 
   
-Probably will abandon prototyping apps on custom Linux servers from scratch, in favor of a BAAS. Playing around with Firebase now.  
-  
 
 # 
 # Primary functions of this server:  
