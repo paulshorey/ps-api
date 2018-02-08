@@ -25,24 +25,38 @@ process.app.get('/v1/jobs/all', function(request, response) {
     process.console.log('get /v1/jobs/all');
     
     // format response
-    var data = Object.values(jobsDB);
+    let data = Object.values(jobsDB);
 
-    // filter
-    if (request.query) {
-        var query = request.query;
-        for (var param in query) {
-            process.console.log(param, typeof query[param], query[param]);
-            var qRegEx = new RegExp(query[param], "i"); // I like RegExp! Not most efficient, but ok for a site with one user  :)
-            data = data.filter(function(job) {
-                return qRegEx.test(job[param]); // Don't think you can inject malicious code from a URI variable into a RegExpression. Can you?
-            });
+    if (data[0]) {
+
+        // filter
+        if (request.query) {
+
+                // search
+                var query = request.query;
+                for (var param in query) {
+                    if (typeof data[0][param] !== undefined) {
+                        process.console.log(param, typeof query[param], query[param]);
+                        var qRegEx = new RegExp(query[param], "i"); // I like RegExp! Not most efficient, but ok for a site with one user  :)
+                        data = data.filter(function(job) {
+                            return qRegEx.test(job[param]); // Don't think you can inject malicious code from a URI variable into a RegExpression. Can you?
+                        });
+                    }
+                }
+
+                // limit
+                if (request.query.limit) {
+                    data = data.slice(0,request.query.limit);
+                }
+
         }
-    }
 
-    // sort
-    data.sort(function(a,b) {
-        return b._rating - a._rating;
-    });
+        // sort
+        data.sort(function(a,b) {
+            return b._rating - a._rating;
+        });
+
+    }
 
     // success response
     response.setHeader('Content-Type', 'application/json');
