@@ -53,12 +53,9 @@ process.app.get('/v1/jobs/all', function(request, response) {
         });
 
         // limit
-        let query_limit = parseInt(request.query.result_limit);
-        let query_start = parseInt(request.query.result_start);
-            query_start = (query_start ? parseInt(request.query.result_start)-1 : 0)
-        if (request.query.result_limit) {
-            data = data.slice( query_start, query_limit+query_start);
-        }
+        let query_limit = parseInt(request.query.limit) || 1000;
+        let query_start = parseInt(request.query.start) || 0;
+        data = data.slice( query_start, query_limit+query_start);
 
     }
 
