@@ -1,6 +1,6 @@
 // My pretend DB
 // It returns an object with key-value pairs. Key is the unique hash generated from the job listing's title and company. 
-// I'll then convert it to array and practice filtering and work with data :)
+// I'll then convert it to array and practice filtering and work with data
 let jobsDB = {};
 const jobsDB_file = "/www/db/v1_jobs";
 if (!process.fs.existsSync("/www/db")){
@@ -141,13 +141,10 @@ const processJobs = function(results){
         }
 
         // [ + ] location
-        if (/San Diego|South Jordan|Draper, UT|remote|denver/i.test(res.location)) {
-            res._rating += 2000;
+        if (/, CA/i.test(res.location)) {
+            res._rating += 3000;
         }
-        if (/, CA|, AZ|, UT|, CO|, ID/i.test(res.location)) {
-            res._rating += 1000;
-        }
-        if (/New York|Philadelphia|phoenix/i.test(res.location)) {
+        if (/, AZ|, UT|, CO|, ID/i.test(res.location)) {
             res._rating += 1000;
         }
 
@@ -167,42 +164,42 @@ const processJobs = function(results){
         if (/Java/i.test(res.text) && /JSP/i.test(res.text)) { // both match
             res._rating -= 1000;
         }
-        if (/synergy|financial|bank|invest|account|lend|credit union|drupal|joomla/i.test(res.text)) { // ok with fin-tech, just don't want to work at a bank
-            res._rating -= 500;
+        if (/synergy|financial|bank|invest|account|lend|credit union|drupal|joomla/i.test(res.text)) { // fine with fin-tech, but would rather not work in a very strict corporate and beaurocratic environment
+            res._rating -= 1000;
         }
         if ( ! (/html|css|sass|style|front/i.test(res.text)) ) { // !
-            res._rating -= 250;
+            res._rating -= 1000;
         }
 
         // [ + ] text
         if (/front|ui/i.test(res.name)) { // in NAME
             res._rating += 2000;
         }
-        if (/ux/i.test(res.name)) { // in NAME
+        if (/react|es6|ui|ux/i.test(res.name)) { // in NAME
             res._rating += 1000;
         }
-        if (/react|es6|ui/i.test(res.text)) {
-            res._rating += 1000;
+        if (/react|es6|ui|ux/i.test(res.text)) {
+            res._rating += 2000;
         }
-        if (/react|es6|node|front|ux|art|music|design|flexible/i.test(res.text)) {
-            res._rating += 500;
+        if (/node|front|art|music|design|flexible/i.test(res.text)) {
+            res._rating += 1000;
         }
         if (/iot|embedded|php|ux|designer|illustrator|responsive/i.test(res.text)) {
-            res._rating += 250;
+            res._rating += 1000;
         }
 
-        // _rating to _stars
-        if (res._rating > 105000) {
-            res._stars = 5;
-        } else if (res._rating > 103000) {
-            res._stars = 4;
-        } else if (res._rating > 101000) {
-            res._stars = 3;
-        } else if (res._rating > 99000) {
-            res._stars = 2;
-        } else {
-            res._stars = 1;
-        }
+        // // _rating to _stars
+        // if (res._rating > 105000) {
+        //     res._stars = 5;
+        // } else if (res._rating > 103000) {
+        //     res._stars = 4;
+        // } else if (res._rating > 101000) {
+        //     res._stars = 3;
+        // } else if (res._rating > 99000) {
+        //     res._stars = 2;
+        // } else {
+        //     res._stars = 1;
+        // }
 
         // save to DB
         res._status = "new";
