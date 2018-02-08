@@ -26,6 +26,7 @@ process.app.get('/v1/jobs/all', function(request, response) {
     
     // format response
     let data = Object.values(jobsDB);
+    let thelimit = "test";
 
     if (data[0]) {
 
@@ -35,9 +36,9 @@ process.app.get('/v1/jobs/all', function(request, response) {
                 // search
                 var query = request.query;
                 for (var param in query) {
-                    if (typeof data[0][param] !== undefined) {
+                    if (typeof data[0][param] !== "undefined") {
                         process.console.log(param, typeof query[param], query[param]);
-                        var qRegEx = new RegExp(query[param], "i"); // I like RegExp! Not most efficient, but ok for a site with one user  :)
+                        var qRegEx = new RegExp(query[param], "i"); // I like RegExp! Not most efficient, but ok for a site with one user
                         data = data.filter(function(job) {
                             return qRegEx.test(job[param]); // Don't think you can inject malicious code from a URI variable into a RegExpression. Can you?
                         });
