@@ -45,17 +45,20 @@ process.app.get('/v1/jobs/all', function(request, response) {
                     }
                 }
 
-                // limit
-                if (request.query.limit) {
-                    data = data.slice(0,request.query.limit);
-                }
-
         }
 
         // sort
         data.sort(function(a,b) {
             return b._rating - a._rating;
         });
+
+        // limit
+        let query_limit = parseInt(request.query.result_limit);
+        let query_start = parseInt(request.query.result_start);
+            query_start = (query_start ? parseInt(request.query.result_start)-1 : 0)
+        if (request.query.result_limit) {
+            data = data.slice( query_start, query_limit+query_start);
+        }
 
     }
 
